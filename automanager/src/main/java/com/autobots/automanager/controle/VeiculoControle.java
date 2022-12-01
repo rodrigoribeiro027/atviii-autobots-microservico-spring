@@ -31,7 +31,6 @@ public class VeiculoControle {
 		List<Veiculo> veiculos = repositorio.findAll();
 		return new ResponseEntity<List<Veiculo>>(veiculos,HttpStatus.FOUND);
 	}
-	
 	@GetMapping("/obterVeiculo/{id}")
 	public ResponseEntity<Veiculo> buscarVeiculo(@PathVariable Long id){
 		Veiculo veiculo = repositorio.findById(id).orElse(null);

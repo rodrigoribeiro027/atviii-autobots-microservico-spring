@@ -1,0 +1,27 @@
+Cadastros
+
+CLIENTE:			Cadastro:
+FUNCIONARIO:    		Cadastro:
+FORNECEDOR:			Cadastro:ok
+
+
+
+
+
+Crud
+
+
+Email  			buscas:ok  Cadastro:	Atualizar:      Deletar:
+Documento  		buscas:ok  Cadastro:	Atualizar:      Deletar:
+Servico	  		buscas:ok  Cadastro:	Atualizar:	Deletar:
+Telefone   		buscas:ok  Cadastro:	Atualizar:      Deletar:
+Usuario    		buscas:ok  Cadastro:ok	Atualizar:	Deletar:
+Veiculo    		buscas:ok  Cadastro:	Atualizar:	Deletar:
+venda	  		buscas:ok  Cadastro:	Atualizar:	Deletar:
+Mercadoria 		buscas:ok  Cadastro:	Atualizar:	Deletar:
+Endereco   		buscas:ok  Cadastro:	Atualizar:	Deletar:
+Empresa    		buscas:ok  Cadastro:	Atualizar:	Deletar:
+CredencialCodigoBarra   buscas:	   Cadastro:	Atualizar:	Deletar:
+
+
+

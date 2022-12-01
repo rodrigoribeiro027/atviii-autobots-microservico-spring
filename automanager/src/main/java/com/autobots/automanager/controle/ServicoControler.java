@@ -24,6 +24,7 @@ public class ServicoControler {
 		List<Servico> servicos = repositorio.findAll();
 		return new ResponseEntity<List<Servico>>(servicos, HttpStatus.FOUND);
 	}
+	
 	@GetMapping("/buscar/{id}")
 	public ResponseEntity<Servico> buscarServico(@PathVariable Long id){
 		Servico servico = repositorio.findById(id).orElse(null);

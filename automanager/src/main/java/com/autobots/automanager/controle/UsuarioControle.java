@@ -32,7 +32,6 @@ public class UsuarioControle {
 	public ResponseEntity<Usuario> buscarusuarioID(@PathVariable Long id){
 		Usuario usuario = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
-		
 		if(usuario == null) {
 			status = HttpStatus.NOT_FOUND;
 		}
@@ -44,6 +43,12 @@ public class UsuarioControle {
 	@PostMapping("/cadastro-fornecedor")
 	public ResponseEntity<Usuario> cadastrarUsuarioFornecedor(@RequestBody Usuario dados){
 		dados.getPerfis().add(PerfilUsuario.FORNECEDOR);
+		Usuario usuario = repositorio.save(dados);
+		return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
+	}
+	@PostMapping("/cadastrar-Cliente")
+	public ResponseEntity<Usuario> cadastrarUsuarioCliente(@RequestBody Usuario dados){
+		dados.getPerfis().add(PerfilUsuario.CLIENTE);
 		Usuario usuario = repositorio.save(dados);
 		return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
 	}

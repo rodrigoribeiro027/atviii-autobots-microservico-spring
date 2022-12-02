@@ -67,6 +67,8 @@ public class UsuarioControle {
 		Usuario usuario = repositorio.save(dados);
 		return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
 	}
+	
+	
 	@PostMapping("/cadastro-funcionario/{idEmpresa}")
 	public ResponseEntity<?> cadastrarPerfilFuncionario(@RequestBody Usuario dados, @PathVariable Long idEmpresa){
 		dados.getPerfis().add(PerfilUsuario.FUNCIONARIO);

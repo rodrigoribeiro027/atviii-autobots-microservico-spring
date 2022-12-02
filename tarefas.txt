@@ -5,23 +5,35 @@ FUNCIONARIO:    		Cadastro:ok
 FORNECEDOR:			Cadastro:ok
 
 
+insominia:
+veiculo:
+
+servico:
+
+empresa:
+
+mercadoria:
+ 
+usuario post Cadastro cli: ok 
+post cadastro func:  
+post cadastro Forne:
+
+venda:
 
 
 
 Crud
 
-
-Email  			buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
-Documento  		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
-Servico	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
-Telefone   		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
-Usuario    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
-Veiculo    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
-venda	  		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
-Mercadoria 		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
-Endereco   		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
-Empresa    		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
-CredencialCodigoBarra   buscas:	   Cadastro:	Atualizar:	  Deletar:      insominia:
-
+Email  			buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
+Documento  		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
+Servico	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+Telefone   		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
+Usuario    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+Veiculo    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+venda	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+Mercadoria 		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+Endereco   		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+Empresa    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
+CredencialCodigoBarra   buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
 
 

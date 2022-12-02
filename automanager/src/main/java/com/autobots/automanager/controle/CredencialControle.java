@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entitades.Empresa;
 import com.autobots.automanager.entitades.Mercadoria;
@@ -30,10 +28,12 @@ import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.repositorios.RepositorioVeiculo;
 import com.autobots.automanager.repositorios.RepositorioVenda;
 
-
-@RestController
-@RequestMapping("/venda")
-public class VendaControle {
+public class CredencialControle {
+	
+	@Autowired
+	public RepositorioMercadoria repositorioMercadoria;
+	@Autowired
+	public RepositorioServico repositorioServico;
 	@Autowired
 	public RepositorioVeiculo repositorioVeiculo;
 	@Autowired
@@ -42,30 +42,24 @@ public class VendaControle {
 	public RepositorioEmpresa repositorioEmpresa;
 	@Autowired
 	public RepositorioUsuario repositorioUsuario;
-	@Autowired
-	public RepositorioMercadoria repositorioMercadoria;
-	@Autowired
-	public RepositorioServico repositorioServico;
-	
-	
-	@GetMapping("/buscarVendas")
-	public ResponseEntity<List<Venda>> buscaVendas(){
+	@GetMapping("/buscar")
+	public ResponseEntity<List<Venda>> buscarVendas() {
 		List<Venda> vendas = repositorio.findAll();
-		return new ResponseEntity<List<Venda>>(vendas,HttpStatus.FOUND);
+		return new ResponseEntity<List<Venda>>(vendas, HttpStatus.FOUND);
 	}
-	
+
 	@GetMapping("/buscar/{id}")
-	public ResponseEntity<Venda> buscarVendaID(@PathVariable Long id){
+	public ResponseEntity<Venda> buscaVendaID(@PathVariable Long id) {
 		Venda venda = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
-		if(venda == null) {
+		if (venda == null) {
 			status = HttpStatus.NOT_FOUND;
-		}else {
+		} 
+		else {
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Venda>(venda, status);
 	}
-	
 	@PostMapping("/cadastrar")
 	public ResponseEntity<Empresa> cadastrarVenda(@RequestBody VendaMolde dados){
 		Empresa empresa = repositorioEmpresa.findById(dados.getIdEmpresa()).orElse(null);
@@ -126,7 +120,6 @@ public class VendaControle {
 			return new ResponseEntity<Empresa>(empresa,HttpStatus.CREATED);
 		}
 	}
-	
 	@DeleteMapping("/excluir/{idVenda}")
 	public ResponseEntity<?> excluirVendaID(@PathVariable Long idVenda) {
 		List<Empresa> empresas = repositorioEmpresa.findAll();
@@ -135,7 +128,7 @@ public class VendaControle {
 		Venda verificador = repositorio.findById(idVenda).orElse(null);
 
 		if (verificador == null) {
-			return new ResponseEntity<>("Venda não encontrad :/", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("Venda não encontrada :/", HttpStatus.NOT_FOUND);
 		} 
 		else {
 			for (Empresa empresa : repositorioEmpresa.findAll()) {
@@ -185,8 +178,8 @@ public class VendaControle {
 		if (venda == null) {
 			return new ResponseEntity<>("Venda não encontrada :/", HttpStatus.NOT_FOUND);
 		} 
-		else{
-			if (dados != null){
+		else {
+			if (dados != null) {
 				if (dados.getIdentificacao() != null) {
 					venda.setIdentificacao(dados.getIdentificacao());
 				}

@@ -18,8 +18,17 @@ public class Servico {
 	private Long id;
 	@Column(nullable = false)
 	private String nome;
+	@Column
+	private Boolean original;
 	@Column(nullable = false)
 	private double valor;
 	@Column
 	private String descricao;
+	
+	public Boolean getOriginal() {
+		return this.original;
+	}
+	public void setOriginal(Boolean original) {
+		this.original = original;
+	}
 }

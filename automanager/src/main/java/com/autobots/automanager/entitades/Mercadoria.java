@@ -30,4 +30,7 @@ public class Mercadoria {
 	private double valor;
 	@Column()
 	private String descricao;
+	public void setOriginal(boolean b) {
+		
+	}
 }

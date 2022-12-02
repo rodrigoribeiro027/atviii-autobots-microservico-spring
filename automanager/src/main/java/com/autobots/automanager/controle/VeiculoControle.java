@@ -5,26 +5,32 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entitades.Usuario;
 import com.autobots.automanager.entitades.Veiculo;
+import com.autobots.automanager.entitades.Venda;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.repositorios.RepositorioVeiculo;
+import com.autobots.automanager.repositorios.RepositorioVenda;
 
 @RestController
 @RequestMapping("/veiculo")
 public class VeiculoControle {
 	@Autowired
 	private RepositorioVeiculo repositorio;
-	
+	@Autowired
+	private RepositorioVenda repositorioVenda;
 	@Autowired
 	private RepositorioUsuario repositorioUsuario;
+	
 	
 	@GetMapping("/buscarVeiculos")
 	public ResponseEntity<List<Veiculo>> obterVeiculos(){
@@ -43,7 +49,7 @@ public class VeiculoControle {
 		}
 		return new ResponseEntity<Veiculo>(veiculo,status);
 	}
-	@PostMapping("/cadastrar/{idUsuario}")
+	@PostMapping("/cadastro/{idUsuario}")
 	public ResponseEntity<Usuario> cadastrarVeiculoCliente(@RequestBody Veiculo dados, @PathVariable Long idUsuario){
 		Usuario usuario = repositorioUsuario.findById(idUsuario).orElse(null);
 		HttpStatus status = null;
@@ -57,5 +63,57 @@ public class VeiculoControle {
 			status = HttpStatus.CREATED;
 		}
 		return new ResponseEntity<Usuario>(usuario,status);
+	}
+	@DeleteMapping("/excluir/{idVeiculo}")
+	public ResponseEntity<?> excluirVeiculoID(@PathVariable Long idVeiculo){
+		List<Usuario> usuarios = repositorioUsuario.findAll();
+		Veiculo verificacao = repositorio.findById(idVeiculo).orElse(null);
+		
+		if(verificacao == null) {
+			return new ResponseEntity<>("Veiculo não encontrado :/",HttpStatus.NOT_FOUND);
+		}
+		else {
+			for(Usuario usuario: repositorioUsuario.findAll()) {
+				if(!usuario.getVeiculos().isEmpty()) {
+					for(Veiculo veiculoUsuario: usuario.getVeiculos()) {
+						if(veiculoUsuario.getId() == idVeiculo) {
+							for(Usuario usuarioRegistrado: usuarios) {
+								usuarioRegistrado.getVeiculos().remove(veiculoUsuario);
+							}
+						}
+					}
+				}
+			}
+		for(Venda venda: repositorioVenda.findAll()) {
+				if(venda.getVeiculo() != null) {
+					if(venda.getVeiculo().getId() == idVeiculo) {
+						venda.setVeiculo(null);
+					}
+				}
+			}
+			usuarios = repositorioUsuario.findAll();
+			repositorio.deleteById(idVeiculo);
+			return new ResponseEntity<>("Veiculo excluido :D",HttpStatus.ACCEPTED);
+		}
+	}
+	
+	@PutMapping("/atualizar/{idVeiculo}")
+	public ResponseEntity<?> atualizarVeiculoID(@PathVariable Long idVeiculo, @RequestBody Veiculo dados){
+		Veiculo veiculo = repositorio.findById(idVeiculo).orElse(null);
+		if(veiculo == null) {
+			return new ResponseEntity<>("Veiculo não encontrado :/",HttpStatus.NOT_FOUND);
+		}
+		else {
+			if(dados != null) {
+				if(dados.getModelo() != null) {
+					veiculo.setModelo(dados.getModelo());
+				}
+				if(dados.getPlaca() != null) {
+					veiculo.setPlaca(dados.getPlaca());
+				}
+				repositorio.save(veiculo);
+			}
+			return new ResponseEntity<>(veiculo,HttpStatus.ACCEPTED);
+		}
 	}
 }

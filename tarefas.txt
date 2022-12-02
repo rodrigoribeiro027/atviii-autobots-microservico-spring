@@ -1,7 +1,7 @@
 Cadastros
 
-CLIENTE:			Cadastro:
-FUNCIONARIO:    		Cadastro:
+CLIENTE:			Cadastro:ok
+FUNCIONARIO:    		Cadastro:ok
 FORNECEDOR:			Cadastro:ok
 
 
@@ -11,17 +11,17 @@ FORNECEDOR:			Cadastro:ok
 Crud
 
 
-Email  			buscas:ok  Cadastro:	Atualizar:      Deletar:
-Documento  		buscas:ok  Cadastro:	Atualizar:      Deletar:
-Servico	  		buscas:ok  Cadastro:	Atualizar:	Deletar:
-Telefone   		buscas:ok  Cadastro:	Atualizar:      Deletar:
-Usuario    		buscas:ok  Cadastro:ok	Atualizar:	Deletar:
-Veiculo    		buscas:ok  Cadastro:	Atualizar:	Deletar:
-venda	  		buscas:ok  Cadastro:	Atualizar:	Deletar:
-Mercadoria 		buscas:ok  Cadastro:	Atualizar:	Deletar:
-Endereco   		buscas:ok  Cadastro:	Atualizar:	Deletar:
-Empresa    		buscas:ok  Cadastro:	Atualizar:	Deletar:
-CredencialCodigoBarra   buscas:	   Cadastro:	Atualizar:	Deletar:
+Email  			buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
+Documento  		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
+Servico	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
+Telefone   		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok    insominia:
+Usuario    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
+Veiculo    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
+venda	  		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
+Mercadoria 		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
+Endereco   		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok    insominia:
+Empresa    		buscas:ok  Cadastro:	Atualizar:	  Deletar:      insominia:
+CredencialCodigoBarra   buscas:	   Cadastro:	Atualizar:	  Deletar:      insominia:
 
 
 

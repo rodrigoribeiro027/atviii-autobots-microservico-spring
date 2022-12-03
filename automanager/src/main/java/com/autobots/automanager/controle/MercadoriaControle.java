@@ -1,5 +1,6 @@
 package com.autobots.automanager.controle;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.autobots.automanager.entitades.Empresa;
 import com.autobots.automanager.entitades.Mercadoria;
 import com.autobots.automanager.entitades.Usuario;
 import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.modeleos.AdicionadorLinkMercadoria;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.RepositorioMercadoria;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
@@ -36,13 +38,29 @@ public class MercadoriaControle {
 	private RepositorioUsuario repositorioUsuario;
 	@Autowired
 	private RepositorioVenda repositorioVenda;
+	@Autowired
+	private AdicionadorLinkMercadoria adicionarLink;
 	
 	@GetMapping("/buscar")
 	public ResponseEntity<List<Mercadoria>> buscarMercadorias(){
 		List<Mercadoria> mercadorias = repositorio.findAll();
+		List<Mercadoria> novaListaMercadoria = new ArrayList<Mercadoria>();
+		
+		for(Mercadoria mercadoriaRegistrada: mercadorias) {
+			
+			if(mercadoriaRegistrada.getOriginal() != null) {				
+				if(mercadoriaRegistrada.getOriginal() == true) {
+					adicionarLink.adicionarLinkUpdate(mercadoriaRegistrada);
+					adicionarLink.adicionarLinkDelete(mercadoriaRegistrada);
+					novaListaMercadoria.add(mercadoriaRegistrada);
+				}
+			}
+		}
+		adicionarLink.adicionarLink(novaListaMercadoria);
 		return new ResponseEntity<List<Mercadoria>>(mercadorias, HttpStatus.FOUND);
 	}
 	
+
 	@GetMapping("/buscar/{id}")
 	public ResponseEntity<Mercadoria> buscarMercadoriaID(@PathVariable Long id){
 		Mercadoria mercadoria = repositorio.findById(id).orElse(null);
@@ -51,26 +69,38 @@ public class MercadoriaControle {
 			status = HttpStatus.NOT_FOUND;
 		}
 		else {
+			adicionarLink.adicionarLink(mercadoria);
+			adicionarLink.adicionarLinkUpdate(mercadoria);
+			adicionarLink.adicionarLinkDelete(mercadoria);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Mercadoria>(mercadoria,status);
 	}
 	
+	
 	@PostMapping("/cadastrar/{idEmpresa}")
 	public ResponseEntity<Empresa> cadastrarMercadoriaEmpresa(@RequestBody Mercadoria dados, @PathVariable Long idEmpresa){
-		dados.setOriginal(true);
 		Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
+		dados.setOriginal(true);
 		dados.setCadastro(new Date());
 		HttpStatus status = null;
 		if(empresa == null) {
 			status = HttpStatus.NOT_FOUND;
-		}else {
+		}
+		else {
 			empresa.getMercadorias().add(dados);
 			repositorioEmpresa.save(empresa);
+			for(Mercadoria mercadoria: empresa.getMercadorias()) {
+				adicionarLink.adicionarLink(mercadoria);
+				adicionarLink.adicionarLinkUpdate(mercadoria);
+				adicionarLink.adicionarLinkDelete(mercadoria);
+			}
 			status = HttpStatus.CREATED;
 		}
 		return new ResponseEntity<Empresa>(empresa,status);
 	}
+	
+	
 	
 	@DeleteMapping("/excluir/{idMercadoria}")
 	public ResponseEntity<?> excluirMercadoriaEmpresa(@PathVariable Long idMercadoria){
@@ -151,6 +181,24 @@ public class MercadoriaControle {
 			return new ResponseEntity<>(mercadoria, HttpStatus.ACCEPTED);
 		}
 	}
-	
+	@PostMapping("/cadastrar-fornecedor/{idUsuarioFornecedor}")
+	public ResponseEntity<?> cadastrarMercadoriaFornecedor(@RequestBody Mercadoria dados, @PathVariable Long idUsuarioFornecedor){
+		Usuario usuario = repositorioUsuario.findById(idUsuarioFornecedor).orElse(null);
+		dados.setOriginal(true);
+		dados.setCadastro(new Date());
+		if(usuario == null) {
+			return new ResponseEntity<>("Usuario não encontrado :/",HttpStatus.NOT_FOUND);
+		}
+		else {
+			usuario.getMercadorias().add(dados);
+			repositorioUsuario.save(usuario);
+			for(Mercadoria mercadoria: usuario.getMercadorias()) {
+				adicionarLink.adicionarLink(mercadoria);
+				adicionarLink.adicionarLinkUpdate(mercadoria);
+				adicionarLink.adicionarLinkDelete(mercadoria);
+			}
+			return new ResponseEntity<>(usuario,HttpStatus.CREATED);
+		}
+	}
 	
 }

@@ -14,7 +14,7 @@ public class CredencialUsuarioSenha extends Credencial {
 	private String nomeUsuario;
 	@Column(nullable = false)
 	private String senha;
-	
+
 	public String getNomeUsuario() {
 		return nomeUsuario;
 	}

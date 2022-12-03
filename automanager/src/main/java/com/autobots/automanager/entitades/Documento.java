@@ -8,13 +8,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.autobots.automanager.enumeracoes.TipoDocumento;
 
 import lombok.Data;
 
 @Data
 @Entity
-public class Documento {
+public class Documento extends RepresentationModel<Documento>{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -24,6 +26,7 @@ public class Documento {
 	private Date dataEmissao;
 	@Column(unique = true, nullable = false)
 	private String numero;
+
 	public Long getId() {
 		return id;
 	}

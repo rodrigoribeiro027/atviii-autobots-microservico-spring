@@ -10,12 +10,14 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import lombok.Data;
 
 @Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Credencial {
+public abstract class Credencial extends RepresentationModel<Credencial>{
 	@Id()
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

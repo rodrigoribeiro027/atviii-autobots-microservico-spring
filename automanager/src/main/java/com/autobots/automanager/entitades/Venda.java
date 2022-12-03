@@ -15,33 +15,84 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(exclude = { "cliente", "funcionario", "veiculo" })
+@EqualsAndHashCode(exclude = { "cliente", "funcionario", "veiculo", "servicos" })
 @Entity
-public class Venda {
+public class Venda extends RepresentationModel<Venda>{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private Date cadastro;
-	@Column(nullable = false, unique = true)
+	@Column(nullable = true, unique = true)
 	private String identificacao;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	@JsonIgnoreProperties(value = {"credencias", "mercadorias","vendas","veiculos"})
+	@JsonIgnoreProperties(value = {"credenciais", "mercadorias", "veiculos"})
 	private Usuario cliente;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+	@JsonIgnoreProperties(value = {"credenciais", "mercadorias", "vendas", "veiculos"})
 	private Usuario funcionario;
-	@JsonIgnoreProperties(value = {"credencias", "mercadorias","vendas","veiculos"})
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	private Set<Mercadoria> mercadorias = new HashSet<>();
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	private Set<Servico> servicos = new HashSet<>();
 	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	@JsonIgnoreProperties(value = {"vendas","proprietario"})
+	@JsonIgnoreProperties(value = {"proprietario" , "vendas"})
 	private Veiculo veiculo;
+	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Date getCadastro() {
+		return cadastro;
+	}
+	public void setCadastro(Date cadastro) {
+		this.cadastro = cadastro;
+	}
+	public String getIdentificacao() {
+		return identificacao;
+	}
+	public void setIdentificacao(String identificacao) {
+		this.identificacao = identificacao;
+	}
+	public Usuario getCliente() {
+		return cliente;
+	}
+	public void setCliente(Usuario cliente) {
+		this.cliente = cliente;
+	}
+	public Usuario getFuncionario() {
+		return funcionario;
+	}
+	public void setFuncionario(Usuario funcionario) {
+		this.funcionario = funcionario;
+	}
+	public Set<Mercadoria> getMercadorias() {
+		return mercadorias;
+	}
+	public void setMercadorias(Set<Mercadoria> mercadorias) {
+		this.mercadorias = mercadorias;
+	}
+	public Set<Servico> getServicos() {
+		return servicos;
+	}
+	public void setServicos(Set<Servico> servicos) {
+		this.servicos = servicos;
+	}
+	public Veiculo getVeiculo() {
+		return veiculo;
+	}
+	public void setVeiculo(Veiculo veiculo) {
+		this.veiculo = veiculo;
+	}
 }

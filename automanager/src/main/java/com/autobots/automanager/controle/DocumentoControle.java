@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entitades.Documento;
 import com.autobots.automanager.entitades.Usuario;
+import com.autobots.automanager.modeleos.AdicionadorLinkDocumento;
 import com.autobots.automanager.repositorios.RepositorioDocumento;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 
@@ -28,25 +29,40 @@ public class DocumentoControle {
 	@Autowired
 	private RepositorioUsuario repositorioUsuario;
 	
+	@Autowired
+	private AdicionadorLinkDocumento adicionarLink;
+	
 	@GetMapping("/buscarDocumentos")
 	public ResponseEntity<List<Documento>> ObterDocumentos(){
 		List<Documento> documentos = repositorio.findAll();
+		adicionarLink.adicionarLink(documentos);
+		if(!documentos.isEmpty()) {		
+			for(Documento documento: documentos) {
+				adicionarLink.adicionarLinkUpdate(documento);
+				adicionarLink.adicionarLinkDelete(documento);
+			}
+		}
 		return new ResponseEntity<List<Documento>>(documentos,HttpStatus.FOUND);
 	}
 	
-	@GetMapping("/busca/{id}")
+	@GetMapping("/buscar/{id}")
 	public ResponseEntity<Documento> ObterDocumentoID(@PathVariable Long id){
 		Documento documento = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
-		if(documento == null) 
-		{
+		if(documento == null) {
 			status = HttpStatus.NOT_FOUND;
 		}
 		else {
+			adicionarLink.adicionarLink(documento);
+			adicionarLink.adicionarLinkUpdate(documento);
+			adicionarLink.adicionarLinkDelete(documento);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Documento>(documento,status);
 	}
+	
+	
+	
 	
 	@PutMapping("/atualizar/{idDocumento}")
 	public ResponseEntity<?> atualizarDocumentoID(@PathVariable Long idDocumento, @RequestBody Documento dados) {

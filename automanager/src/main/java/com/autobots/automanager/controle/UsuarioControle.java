@@ -18,6 +18,7 @@ import com.autobots.automanager.entitades.Usuario;
 import com.autobots.automanager.entitades.Veiculo;
 import com.autobots.automanager.entitades.Venda;
 import com.autobots.automanager.enumeracoes.PerfilUsuario;
+import com.autobots.automanager.modeleos.AdicionadorLinkUsuario;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.repositorios.RepositorioVeiculo;
@@ -35,54 +36,85 @@ public class UsuarioControle {
 	private RepositorioVeiculo repositorioVeiculo;
 	@Autowired
 	private RepositorioUsuario repositorio;
+	@Autowired
+	private AdicionadorLinkUsuario adicionarLink;
+	
 	
 	
 	@GetMapping("/buscar")
 	public ResponseEntity<List<Usuario>> buscarUsuarios(){
 		List<Usuario> usuarios = repositorio.findAll();
+		adicionarLink.adicionarLink(usuarios);
+		if(!usuarios.isEmpty()) {
+			for(Usuario usuario: usuarios) {
+				adicionarLink.adicionarLinkUpdate(usuario);
+				adicionarLink.adicionarLinkDelete(usuario);
+			}
+		}
 		return new ResponseEntity<List<Usuario>>(usuarios,HttpStatus.FOUND);
 	}
+
+	
 	
 	@GetMapping("/buscarUsuario/{id}")
-	public ResponseEntity<Usuario> buscarusuarioID(@PathVariable Long id){
+	public ResponseEntity<Usuario> buscarUsuarioID(@PathVariable Long id){
 		Usuario usuario = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
+		
 		if(usuario == null) {
 			status = HttpStatus.NOT_FOUND;
 		}
 		else {
+			adicionarLink.adicionarLink(usuario);
+			adicionarLink.adicionarLinkUpdate(usuario);
+			adicionarLink.adicionarLinkDelete(usuario);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Usuario>(usuario,status);
 	}
+	
+	
 	@PostMapping("/cadastro-fornecedor")
 	public ResponseEntity<Usuario> cadastrarPerfilFornecedor(@RequestBody Usuario dados){
 		dados.getPerfis().add(PerfilUsuario.FORNECEDOR);
 		Usuario usuario = repositorio.save(dados);
+		adicionarLink.adicionarLink(usuario);
+		adicionarLink.adicionarLinkUpdate(usuario);
+		adicionarLink.adicionarLinkDelete(usuario);
 		return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
 	}
-	@PostMapping("/cadastro-Cliente")
-	public ResponseEntity<Usuario> cadastrarUsuarioCliente(@RequestBody Usuario dados){
+	
+	@PostMapping("/cadastro-cliente")
+	public ResponseEntity<Usuario> cadastroUsuarioCliente(@RequestBody Usuario dados){
 		dados.getPerfis().add(PerfilUsuario.CLIENTE);
 		Usuario usuario = repositorio.save(dados);
+		adicionarLink.adicionarLink(usuario);
+		adicionarLink.adicionarLinkUpdate(usuario);
+		adicionarLink.adicionarLinkDelete(usuario);
 		return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
 	}
 	
-	
 	@PostMapping("/cadastro-funcionario/{idEmpresa}")
-	public ResponseEntity<?> cadastrarPerfilFuncionario(@RequestBody Usuario dados, @PathVariable Long idEmpresa){
+	public ResponseEntity<?> cadastrPerfilFuncionario(@RequestBody Usuario dados, @PathVariable Long idEmpresa){
 		dados.getPerfis().add(PerfilUsuario.FUNCIONARIO);
 		Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
 		if(empresa == null) {
-			return new ResponseEntity<String>("Empresa não encontrada :/.", HttpStatus.NOT_FOUND);
-		}else {
+			return new ResponseEntity<String>("Empresa não encontrada :/", HttpStatus.NOT_FOUND);
+		}
+		else {
 			empresa.getUsuarios().add(dados);
 			repositorioEmpresa.save(empresa);
+			
+			for(Usuario usuario: empresa.getUsuarios()) {
+				adicionarLink.adicionarLink(usuario);
+				adicionarLink.adicionarLinkUpdate(usuario);
+				adicionarLink.adicionarLinkDelete(usuario);
+			}
 			return new ResponseEntity<Empresa>(empresa, HttpStatus.CREATED);
 		}
 	}
 	@DeleteMapping("/excluir/{idUsuario}")
-	public ResponseEntity<?> excluirCliente(@PathVariable Long idUsuario){
+	public ResponseEntity<?> excluirUsuarioID(@PathVariable Long idUsuario){
 		Usuario verificacao = repositorio.findById(idUsuario).orElse(null);
 		if(verificacao == null) {
 			return new ResponseEntity<String>("não encontrei o Usuario :/.",HttpStatus.NOT_FOUND);

@@ -2,7 +2,6 @@ package com.autobots.automanager.controle;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,21 +12,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.autobots.automanager.entitades.Empresa;
-import com.autobots.automanager.entitades.Mercadoria;
-import com.autobots.automanager.entitades.Servico;
+import com.autobots.automanager.entitades.Credencial;
+import com.autobots.automanager.entitades.CredencialCodigoBarra;
+import com.autobots.automanager.entitades.CredencialUsuarioSenha;
 import com.autobots.automanager.entitades.Usuario;
-import com.autobots.automanager.entitades.Veiculo;
-import com.autobots.automanager.entitades.Venda;
-import com.autobots.automanager.modeleos.VendaMolde;
+import com.autobots.automanager.modeleos.AdicionadorLinkCredencialCodigoDeBarra;
+import com.autobots.automanager.modeleos.AdicionarLinkCredencialUsuarioSenha;
+import com.autobots.automanager.repositorios.RepositorioCredencialCodigoBarra;
+import com.autobots.automanager.repositorios.RepositorioCredencialUsuarioSenha;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.RepositorioMercadoria;
 import com.autobots.automanager.repositorios.RepositorioServico;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.repositorios.RepositorioVeiculo;
 import com.autobots.automanager.repositorios.RepositorioVenda;
-
+@RestController
+@RequestMapping("/credencial")
 public class CredencialControle {
 	
 	@Autowired
@@ -42,150 +45,219 @@ public class CredencialControle {
 	public RepositorioEmpresa repositorioEmpresa;
 	@Autowired
 	public RepositorioUsuario repositorioUsuario;
-	@GetMapping("/buscar")
-	public ResponseEntity<List<Venda>> buscarVendas() {
-		List<Venda> vendas = repositorio.findAll();
-		return new ResponseEntity<List<Venda>>(vendas, HttpStatus.FOUND);
-	}
-
-	@GetMapping("/buscar/{id}")
-	public ResponseEntity<Venda> buscaVendaID(@PathVariable Long id) {
-		Venda venda = repositorio.findById(id).orElse(null);
-		HttpStatus status = null;
-		if (venda == null) {
-			status = HttpStatus.NOT_FOUND;
-		} 
-		else {
-			status = HttpStatus.FOUND;
-		}
-		return new ResponseEntity<Venda>(venda, status);
-	}
-	@PostMapping("/cadastrar")
-	public ResponseEntity<Empresa> cadastrarVenda(@RequestBody VendaMolde dados){
-		Empresa empresa = repositorioEmpresa.findById(dados.getIdEmpresa()).orElse(null);
-		Venda venda = new Venda();
-		if(empresa == null) {
-			return new ResponseEntity<Empresa>(empresa,HttpStatus.NOT_FOUND);
+	@Autowired
+	private RepositorioCredencialUsuarioSenha repositorioCredencialUsuarioSenha;
+	@Autowired
+	private RepositorioCredencialCodigoBarra repositorioCredencialCodigoBarra;
+	@Autowired
+	private AdicionarLinkCredencialUsuarioSenha adicionarLinkCredencialUserSenha;
+	@Autowired
+	private AdicionadorLinkCredencialCodigoDeBarra adicionarLinkCredencialCodigoDeBarra;
+	
+	
+	@PostMapping("/cadastrar/{idUsuario}")
+	public ResponseEntity<?> cadastrarCredencialUserSenha(@RequestBody CredencialUsuarioSenha dados, @PathVariable Long idUsuario){
+		Usuario usuario = repositorioUsuario.findById(idUsuario).orElse(null);
+		if(usuario == null) {
+			return new ResponseEntity<String>("Usuario não encontrado :/",HttpStatus.NOT_FOUND);
 		}else {
-			venda.setCliente(repositorioUsuario.findById(dados.getIdCliente()).orElse(null));
-			venda.setFuncionario(repositorioUsuario.findById(dados.getIdFuncionario()).orElse(null));
-			venda.setVeiculo(repositorioVeiculo.findById(dados.getIdVeiculo()).orElse(null));
-			venda.setCadastro(new Date());
-			venda.setIdentificacao(dados.getIdentificacao());
-			repositorio.save(venda);
-			
-			Set<Long> idsMercadorias = dados.getIdMercadorias();
-			Set<Long> idsServicos = dados.getIdServicos();
-			
-			if(dados.getIdMercadorias() != null) {
-				if(dados.getIdMercadorias().size() > 0) {	
-					for (Long id : idsMercadorias) {
-						Mercadoria respostaBuscar = repositorioMercadoria.getById(id);
-						Mercadoria mercadoria = new Mercadoria();
-						mercadoria.setValidade(respostaBuscar.getValidade());
-						mercadoria.setFabricao(respostaBuscar.getFabricao());
-						mercadoria.setCadastro(respostaBuscar.getCadastro());
-						mercadoria.setNome(respostaBuscar.getNome());
-						mercadoria.setQuantidade(respostaBuscar.getQuantidade());
-						mercadoria.setValor(respostaBuscar.getValor());
-						mercadoria.setDescricao(respostaBuscar.getDescricao());
-						mercadoria.setOriginal(false);
-						venda.getMercadorias().add(mercadoria);
-					}
+			List<CredencialUsuarioSenha> credenciais = repositorioCredencialUsuarioSenha.findAll();
+			Boolean verificador = false;
+			for(CredencialUsuarioSenha credencial: credenciais) {
+				if(dados.getNomeUsuario().equals(credencial.getNomeUsuario())) {
+					verificador = true;
 				}
 			}
-
-			if(dados.getIdMercadorias() != null) {	
-				if(dados.getIdServicos().size() > 0) {				
-					for (Long id : idsServicos) {
-						Servico respostaBusca = repositorioServico.getById(id);
-						Servico servico = new Servico();
-						servico.setNome(respostaBusca.getNome());
-						servico.setDescricao(respostaBusca.getDescricao());
-						servico.setValor(respostaBusca.getValor());
-						servico.setOriginal(false);
-						venda.getServicos().add(servico);
-					}
-				}
+			if (verificador == true) {
+				return new ResponseEntity<String>("Credencial ja existente :/",HttpStatus.CONFLICT);
+			}else {
+				dados.setCriacao(new Date());
+				usuario.getCredenciais().add(dados);
+				repositorioUsuario.save(usuario);
+				return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
 			}
-			
-			repositorio.save(venda);
-			
-			empresa.getVendas().add(venda);
-			Usuario funcionario = venda.getFuncionario();
-			
-			funcionario.getVendas().add(venda);
-			repositorioEmpresa.save(empresa);
-			
-			return new ResponseEntity<Empresa>(empresa,HttpStatus.CREATED);
 		}
 	}
-	@DeleteMapping("/excluir/{idVenda}")
-	public ResponseEntity<?> excluirVendaID(@PathVariable Long idVenda) {
-		List<Empresa> empresas = repositorioEmpresa.findAll();
-		List<Usuario> usuarios = repositorioUsuario.findAll();
-		List<Veiculo> veiculos = repositorioVeiculo.findAll();
-		Venda verificador = repositorio.findById(idVenda).orElse(null);
-
-		if (verificador == null) {
-			return new ResponseEntity<>("Venda não encontrada :/", HttpStatus.NOT_FOUND);
-		} 
+	@GetMapping("/buscar-credencial")
+	public ResponseEntity<?> buscarCredenciaisUsuariosSenhas(){
+		List<CredencialUsuarioSenha> credenciais = repositorioCredencialUsuarioSenha.findAll();
+		if(!credenciais.isEmpty()) {
+			adicionarLinkCredencialUserSenha.adicionarLink(credenciais);
+			for(CredencialUsuarioSenha credencial: credenciais) {
+				adicionarLinkCredencialUserSenha.adicionarLinkUpdate(credencial);
+				adicionarLinkCredencialUserSenha.adicionarLinkDelete(credencial);
+			}
+			return new ResponseEntity<List<CredencialUsuarioSenha>>(credenciais, HttpStatus.FOUND);
+		}
 		else {
-			for (Empresa empresa : repositorioEmpresa.findAll()) {
-				if (!empresa.getVendas().isEmpty()) {
-					for (Venda vendaEmpresa : empresa.getVendas()) {
-						if (vendaEmpresa.getId() == idVenda) {
-							for (Empresa empresaRegistrada : empresas) {
-								empresaRegistrada.getVendas().remove(vendaEmpresa);
-							}
-						}
-					}
-				}
-			}
-			for (Usuario usuario : repositorioUsuario.findAll()) {
-				if (!usuario.getVendas().isEmpty()) {
-					for (Venda vendaUsuario : usuario.getVendas()) {
-						if (vendaUsuario.getId() == idVenda) {
-							for (Usuario usuarioRegistrado : usuarios) {
-								usuarioRegistrado.getVendas().remove(vendaUsuario);
-							}
-						}
-					}
-				}
-			}
-			for (Veiculo veiculo : repositorioVeiculo.findAll()) {
-				if (!veiculo.getVendas().isEmpty()) {
-					for (Venda vendaVeiculo : veiculo.getVendas()) {
-						if (vendaVeiculo.getId() == idVenda) {
-							for (Veiculo veiculoRegistrado : veiculos) {
-								veiculoRegistrado.getVendas().remove(vendaVeiculo);
-							}
-						}
-					}
-				}
-			}
-			empresas = repositorioEmpresa.findAll();
-			usuarios = repositorioUsuario.findAll();
-			veiculos = repositorioVeiculo.findAll();
-			repositorio.deleteById(idVenda);
-			return new ResponseEntity<>("Venda excluida :D", HttpStatus.ACCEPTED);
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
 		}
 	}
 	
-	@PutMapping("/atualizar/{idVenda}")
-	public ResponseEntity<?> atualizarVendaID(@PathVariable Long idVenda, @RequestBody Venda dados) {
-		Venda venda = repositorio.findById(idVenda).orElse(null);
-		if (venda == null) {
-			return new ResponseEntity<>("Venda não encontrada :/", HttpStatus.NOT_FOUND);
-		} 
+	@GetMapping("/buscar-credencial/{id}")
+	public ResponseEntity<?> buscarCredencialUsuarioSenhaPorId(@PathVariable Long id){
+		CredencialUsuarioSenha credencial = repositorioCredencialUsuarioSenha.findById(id).orElse(null);
+		if(credencial == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}
 		else {
-			if (dados != null) {
-				if (dados.getIdentificacao() != null) {
-					venda.setIdentificacao(dados.getIdentificacao());
-				}
-				repositorio.save(venda);
+			adicionarLinkCredencialUserSenha.adicionarLink(credencial);
+			adicionarLinkCredencialUserSenha.adicionarLinkUpdate(credencial);
+			adicionarLinkCredencialUserSenha.adicionarLinkDelete(credencial);
+			return new ResponseEntity<CredencialUsuarioSenha>(credencial, HttpStatus.FOUND);
+		}
+	}
+	@GetMapping("/buscar-username")
+	public ResponseEntity<?> buscarCredencialUsuarioSenhaNomeUsuario(@RequestBody CredencialUsuarioSenha dados){
+		List<CredencialUsuarioSenha> credenciais = repositorioCredencialUsuarioSenha.findAll();
+		CredencialUsuarioSenha credencial = null;
+		for( CredencialUsuarioSenha c:credenciais) {
+			if(c.getNomeUsuario().equals(dados.getNomeUsuario())) {
+				credencial = c;
 			}
-			return new ResponseEntity<>(venda, HttpStatus.ACCEPTED);
+		}
+		if(credencial == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}
+		else {
+			adicionarLinkCredencialUserSenha.adicionarLink(credencial);
+			adicionarLinkCredencialUserSenha.adicionarLinkUpdate(credencial);
+			adicionarLinkCredencialUserSenha.adicionarLinkDelete(credencial);
+			return new ResponseEntity<CredencialUsuarioSenha>(credencial, HttpStatus.FOUND);
+		}
+	}
+	@PutMapping("/atualizar/{idCredencial}")
+	public ResponseEntity<?> atualizarCredencialUserSenha(@PathVariable Long idCredencial, @RequestBody CredencialUsuarioSenha dados){
+		CredencialUsuarioSenha credencial = repositorioCredencialUsuarioSenha.findById(idCredencial).orElse(null);
+		if(credencial == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}else {
+			if(dados != null) {
+				if(dados.getNomeUsuario() != null) {
+					credencial.setNomeUsuario(dados.getNomeUsuario());
+				}
+				if(dados.getSenha() != null) {
+					credencial.setSenha(dados.getSenha());
+				}
+				repositorioCredencialUsuarioSenha.save(credencial);
+			}
+			return new ResponseEntity<>(credencial, HttpStatus.ACCEPTED);
+		}
+	}
+	
+	@DeleteMapping("/excluir/{idCredencial}")
+	public ResponseEntity<?> excluirCredencialUserSenha(@PathVariable Long idCredencial){
+		CredencialUsuarioSenha verificacao = repositorioCredencialUsuarioSenha.findById(idCredencial).orElse(null);
+		if(verificacao == null) {
+			return new ResponseEntity<String>("credencial não encontrada...", HttpStatus.NOT_FOUND);
+		}else {
+			
+			for(Usuario usuario:repositorioUsuario.findAll()) {
+				if(!usuario.getCredenciais().isEmpty()) {
+					for(Credencial credencial: usuario.getCredenciais()) {
+						if(credencial.getId() == idCredencial) {
+							usuario.getCredenciais().remove(credencial);
+							repositorioUsuario.save(usuario);
+							break;
+						}
+					}
+				}
+			}
+			
+			return new ResponseEntity<>("Credencial excluida :D", HttpStatus.ACCEPTED);
+		}
+	}
+	@GetMapping("/buscar-codigo-barra")
+	public ResponseEntity<?> buscarCredenciaisCodigoBarras(){
+		List<CredencialCodigoBarra> credenciais = repositorioCredencialCodigoBarra.findAll();
+		adicionarLinkCredencialCodigoDeBarra.adicionarLink(credenciais);
+		for(CredencialCodigoBarra credencial: credenciais) {
+			adicionarLinkCredencialCodigoDeBarra.adicionarLinkUpdate(credencial);
+			adicionarLinkCredencialCodigoDeBarra.adicionarLinkDelete(credencial);
+		}
+		return new ResponseEntity<List<CredencialCodigoBarra>>(credenciais, HttpStatus.FOUND);
+	}
+	
+	
+	@GetMapping("/buscar-codigo-barra/{id}")
+	public ResponseEntity<?> buscarCredencialCodigoBarraPorId(@PathVariable Long id){
+		CredencialCodigoBarra credencial = repositorioCredencialCodigoBarra.findById(id).orElse(null);
+		if(credencial == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}
+		else {
+			adicionarLinkCredencialCodigoDeBarra.adicionarLink(credencial);
+			adicionarLinkCredencialCodigoDeBarra.adicionarLinkUpdate(credencial);
+			adicionarLinkCredencialCodigoDeBarra.adicionarLinkDelete(credencial);
+			return new ResponseEntity<CredencialCodigoBarra>(credencial, HttpStatus.FOUND);
+		}
+	}
+	
+	
+	@PostMapping("/cadastrar-codigo-barra/{idUsuario}")
+	public ResponseEntity<?> cadastrarCredencialCodigoBarra(@RequestBody CredencialCodigoBarra dados, @PathVariable Long idUsuario){
+		Usuario usuario = repositorioUsuario.findById(idUsuario).orElse(null);
+		if(usuario == null) {
+			return new ResponseEntity<String>("credencial não encontrada...", HttpStatus.NOT_FOUND);
+		}else {
+			List<CredencialCodigoBarra> credenciais = repositorioCredencialCodigoBarra.findAll();
+			Boolean verificador = false;
+			for(CredencialCodigoBarra credencial: credenciais) {
+				if(dados.getCodigo() == credencial.getCodigo()) {
+					verificador = true;
+				}
+			}
+			if (verificador == true) {
+				return new ResponseEntity<String>("Credencial ja existente...",HttpStatus.CONFLICT);
+			}
+			else {
+				double randomNumero = Math.random();
+				dados.setCodigo(randomNumero);
+				dados.setCriacao(new Date());
+				usuario.getCredenciais().add(dados);
+				repositorioUsuario.save(usuario);
+				return new ResponseEntity<Usuario>(usuario,HttpStatus.CREATED);
+			}
+		}
+	}
+	
+	
+	@PutMapping("/atualizar-codigo-barra/{idCredencial}")
+	public ResponseEntity<?> atualizarCredencialCodigoBarra(@PathVariable Long idCredencial, @RequestBody CredencialCodigoBarra dados){
+		CredencialCodigoBarra credencial = repositorioCredencialCodigoBarra.findById(idCredencial).orElse(null);
+		if(credencial == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}
+		else {
+			if(dados != null) {
+				
+				credencial.setCodigo(dados.getCodigo());
+				repositorioCredencialCodigoBarra.save(credencial);
+			}
+			return new ResponseEntity<>(credencial, HttpStatus.ACCEPTED);
+		}
+	}
+	
+	
+	@DeleteMapping("/excluir-codigo-barra/{idCredencial}")
+	public ResponseEntity<?> excluirCredencialCodigoBarra(@PathVariable Long idCredencial){
+		CredencialCodigoBarra verificacao = repositorioCredencialCodigoBarra.findById(idCredencial).orElse(null);
+		if(verificacao == null) {
+			return new ResponseEntity<String>("credencial não encontrada :/", HttpStatus.NOT_FOUND);
+		}
+		else {
+			for(Usuario usuario:repositorioUsuario.findAll()) {
+				if(!usuario.getCredenciais().isEmpty()) {
+					for(Credencial credencial: usuario.getCredenciais()) {
+						if(credencial.getId() == idCredencial) {
+							usuario.getCredenciais().remove(credencial);
+							repositorioUsuario.save(usuario);
+							break;
+						}
+					}
+				}
+			}
+			return new ResponseEntity<>("Credencial excluida :D", HttpStatus.ACCEPTED);
 		}
 	}
 }

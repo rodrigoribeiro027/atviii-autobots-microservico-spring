@@ -38,7 +38,7 @@ public class TelefoneControle {
 	}
 	
 	@GetMapping("/buscar/{id}")
-	public ResponseEntity<Telefone> buscarTelefone(@PathVariable Long id){
+	public ResponseEntity<Telefone> buscarTelefoneID(@PathVariable Long id){
 		Telefone telefone = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
 		if(telefone == null) {

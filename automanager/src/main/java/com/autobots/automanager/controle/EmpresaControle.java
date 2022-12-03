@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entitades.Empresa;
+import com.autobots.automanager.modeleos.AdicionadorLinkEmpresa;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 
 @RestController
@@ -24,14 +25,35 @@ import com.autobots.automanager.repositorios.RepositorioEmpresa;
 public class EmpresaControle {
 	@Autowired
 	private RepositorioEmpresa repositorio;
+	@Autowired
+	private AdicionadorLinkEmpresa adicionarLink;
+	
+	@PostMapping("/cadastro")
+	public ResponseEntity<Empresa> cadastroEmpresa(@RequestBody Empresa dados){
+		dados.setCadastro(new Date());
+		Empresa empresa = repositorio.save(dados);
+		adicionarLink.adicionarLink(empresa);
+		adicionarLink.adicionarLinkUpdate(empresa);
+		adicionarLink.adicionarLinkDelete(empresa);
+		return new ResponseEntity<Empresa>(empresa,HttpStatus.CREATED);
+	}
+	
 	
 	@GetMapping("/buscar")
 	public ResponseEntity<List<Empresa>> buscarEmpresas() {
 		List<Empresa> empresas = repositorio.findAll();
+		adicionarLink.adicionarLink(empresas);
+		if(!empresas.isEmpty()) {
+			for(Empresa empresa: empresas) {
+				adicionarLink.adicionarLinkUpdate(empresa);
+				adicionarLink.adicionarLinkDelete(empresa);
+			}
+		}
 		return new ResponseEntity<List<Empresa>>(empresas,HttpStatus.FOUND);
 	}
 	
-	@GetMapping("/busca/{id}")
+
+	@GetMapping("/buscar/{id}")
 	public ResponseEntity<Empresa> buscarEmpresaID(@PathVariable Long id){
 		Empresa empresa = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
@@ -39,15 +61,19 @@ public class EmpresaControle {
 			status = HttpStatus.NOT_FOUND;
 		}
 		else {
+			adicionarLink.adicionarLink(empresa);
+			adicionarLink.adicionarLinkUpdate(empresa);
+			adicionarLink.adicionarLinkDelete(empresa);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Empresa>(empresa,status);
 	}
+	
 	@PutMapping("/atualizar/{idEmpresa}")
 	public ResponseEntity<?> atualizarEmpresa(@PathVariable Long idEmpresa, @RequestBody Empresa dados){
 		Empresa empresa = repositorio.findById(idEmpresa).orElse(null);
 		if(empresa == null) {
-			return new ResponseEntity<>("Empresa não econtrada...", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("Empresa não Encontrada :/", HttpStatus.NOT_FOUND);
 		}
 		else {
 			if(dados != null) {
@@ -62,13 +88,9 @@ public class EmpresaControle {
 			return new ResponseEntity<>(empresa, HttpStatus.ACCEPTED);
 		}
 	}
+	 
 	
-	@PostMapping("/cadastro")
-	public ResponseEntity<Empresa> cadastrarEmpresa(@RequestBody Empresa dados){
-		dados.setCadastro(new Date());
-		Empresa empresa = repositorio.save(dados);
-		return new ResponseEntity<Empresa>(empresa,HttpStatus.CREATED);
-	}
+
 	@DeleteMapping("/excluir/{idEmpresa}")
 	public ResponseEntity<?> excluirEmpresaID(@PathVariable Long idEmpresa){
 		Empresa verificacao = repositorio.findById(idEmpresa).orElse(null);

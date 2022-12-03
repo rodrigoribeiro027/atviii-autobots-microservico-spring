@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobots.automanager.entitades.Usuario;
 import com.autobots.automanager.entitades.Veiculo;
 import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.modeleos.AdicionadorLinkVeiculo;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.repositorios.RepositorioVeiculo;
 import com.autobots.automanager.repositorios.RepositorioVenda;
@@ -29,14 +30,27 @@ public class VeiculoControle {
 	@Autowired
 	private RepositorioVenda repositorioVenda;
 	@Autowired
+	private AdicionadorLinkVeiculo adicionarLink;
+	@Autowired
 	private RepositorioUsuario repositorioUsuario;
 	
 	
 	@GetMapping("/buscarVeiculos")
 	public ResponseEntity<List<Veiculo>> obterVeiculos(){
 		List<Veiculo> veiculos = repositorio.findAll();
+		adicionarLink.adicionarLink(veiculos);
+		
+		if(!veiculos.isEmpty()) {
+			for(Veiculo veiculo: veiculos) {
+				adicionarLink.adicionarLinkUpdate(veiculo);
+				adicionarLink.adicionarLinkDelete(veiculo);
+			}
+		}
+		
 		return new ResponseEntity<List<Veiculo>>(veiculos,HttpStatus.FOUND);
 	}
+	
+	
 	@GetMapping("/obterVeiculo/{id}")
 	public ResponseEntity<Veiculo> buscarVeiculo(@PathVariable Long id){
 		Veiculo veiculo = repositorio.findById(id).orElse(null);
@@ -45,12 +59,18 @@ public class VeiculoControle {
 			status = HttpStatus.NOT_FOUND;
 		}
 		else {
+			adicionarLink.adicionarLink(veiculo);
+			adicionarLink.adicionarLinkUpdate(veiculo);
+			adicionarLink.adicionarLinkDelete(veiculo);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Veiculo>(veiculo,status);
 	}
+	
+	
+
 	@PostMapping("/cadastro/{idUsuario}")
-	public ResponseEntity<Usuario> cadastrarVeiculoCliente(@RequestBody Veiculo dados, @PathVariable Long idUsuario){
+	public ResponseEntity<Usuario> cadastrarVeiculoCliente(@RequestBody Veiculo dados  , @PathVariable Long idUsuario){
 		Usuario usuario = repositorioUsuario.findById(idUsuario).orElse(null);
 		HttpStatus status = null;
 		if(usuario == null) {
@@ -60,9 +80,16 @@ public class VeiculoControle {
 			dados.setProprietario(usuario);
 			usuario.getVeiculos().add(dados);
 			repositorioUsuario.save(usuario);
+			for(Veiculo veiculo: usuario.getVeiculos()) {
+				adicionarLink.adicionarLink(veiculo);
+				adicionarLink.adicionarLinkUpdate(veiculo);
+				adicionarLink.adicionarLinkDelete(veiculo);
+			}
+			
 			status = HttpStatus.CREATED;
 		}
 		return new ResponseEntity<Usuario>(usuario,status);
+		
 	}
 	@DeleteMapping("/excluir/{idVeiculo}")
 	public ResponseEntity<?> excluirVeiculoID(@PathVariable Long idVeiculo){

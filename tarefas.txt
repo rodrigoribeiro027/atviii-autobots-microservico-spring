@@ -1,39 +1,126 @@
-Cadastros
+Cadastros[
 
-CLIENTE:			Cadastro:ok
-FUNCIONARIO:    		Cadastro:ok
-FORNECEDOR:			Cadastro:ok
+CLIENTE:	Cadastro:ok
+FUNCIONARIO:    Cadastro:ok
+FORNECEDOR:	Cadastro:ok
+]
 
+Testes no insominia:[
+       
+  venda:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:ok,
+       put:ok
+       delete:ok
+	]
+   Usuario:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:[
+	    post1:ok
+            post2:ok
+	    post3:ok],
+       put:ok
+       delete:ok
+	]
+Mercadoria:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:[
+	    post1:ok
+            ],
+       put:ok
+       delete:ok
+	]
+Empresa:[
+          get:[
+            get1:ok
+            get2:ok
+		],
+          put:ok
+          delete:ok
+	]
+Servico:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:[
+	    post1:ok
+            ],
+       put:ok
+       delete:ok
+	]
 
-insominia:
-veiculo:
+Veiculo:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:[
+	    post1:ok
+            ],
+       put:ok
+       delete:ok
+	]
+Documento:[
+          get:[
+          get1:ok
+          get2:ok],
+       post:[
+	    post1:ok
+            ],
+       put:ok
+       delete:ok
+	]
+Email:[
+       get:[
+          get1:ok
+          get2:ok],
+       put:ok
+       delete:ok
+	]
+]
+Endereco:[
+       get:[
+          get1:ok
+          get2:ok],
+       put:ok
+       delete:ok
+	]
+Credencial:[
+       Credencial codigo de barra:[
+		get:[
+          	   get1:ok
+                   get2:ok],
+       post:[
+	    post1:ok
+            ]
+		]
+	]
+       Credencial usuario e senha:[
+		get:[
+          	   get1:ok],
+       		delete:ok,
+       		put:ok
+		]
+	]
 
-servico:
+]
 
-empresa:
+Crud[
 
-mercadoria:
- 
-usuario post Cadastro cli: ok 
-post cadastro func:  
-post cadastro Forne:
-
-venda:
-
-
-
-Crud
-
-Email  			buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
-Documento  		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
-Servico	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-Telefone   		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:   
-Usuario    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-Veiculo    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-venda	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-Mercadoria 		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-Endereco   		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-Empresa    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-CredencialCodigoBarra   buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:   
-
-
+Email  			buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:ok  
+Documento  		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:ok  
+Servico	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+Telefone   		buscas:ok  Cadastro:ok	Atualizar:ok      Deletar:ok  hateos:ok 
+Usuario    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+Veiculo    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+venda	  		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+Mercadoria 		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok   
+Endereco   		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+Empresa    		buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+CredencialCodigoBarra   buscas:ok  Cadastro:ok	Atualizar:ok	  Deletar:ok  hateos:ok  
+]

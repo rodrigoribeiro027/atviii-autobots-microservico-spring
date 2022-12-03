@@ -1,5 +1,6 @@
 package com.autobots.automanager.controle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobots.automanager.entitades.Empresa;
 import com.autobots.automanager.entitades.Servico;
 import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.modeleos.AdicionadorLinkServico;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.RepositorioServico;
 import com.autobots.automanager.repositorios.RepositorioVenda;
@@ -29,25 +31,42 @@ public class ServicoControler {
 	@Autowired
 	private RepositorioEmpresa repositorioEmpresa;
 	@Autowired
+	private AdicionadorLinkServico adicionarLink;
+	@Autowired
 	private RepositorioVenda repositorioVenda;
 	
-	@GetMapping("/buscaServicos")
+	@GetMapping("/buscarServicos")
 	public ResponseEntity<List<Servico>> buscarServicos(){
 		List<Servico> servicos = repositorio.findAll();
-		return new ResponseEntity<List<Servico>>(servicos, HttpStatus.FOUND);
+		List<Servico> novaListaServicos = new ArrayList<Servico>();
+		for(Servico servicoRegistrado: servicos) {
+			if(servicoRegistrado.getOriginal() != null) {	
+				if(servicoRegistrado.getOriginal() == true) {
+					adicionarLink.adicionarLinkUpdate(servicoRegistrado);
+					adicionarLink.adicionarLinkDelete(servicoRegistrado);
+					novaListaServicos.add(servicoRegistrado);
+				}
+			}
+		}
+		adicionarLink.adicionarLink(novaListaServicos);
+		return new ResponseEntity<List<Servico>>(novaListaServicos, HttpStatus.FOUND);
 	}
+	
 	@GetMapping("/buscar/{id}")
 	public ResponseEntity<Servico> buscarServicoID(@PathVariable Long id){
 		Servico servico = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
 		if(servico == null) {
 			status = HttpStatus.NOT_FOUND;
-		}
-		else {
+		}else {
+			adicionarLink.adicionarLink(servico);
+			adicionarLink.adicionarLinkUpdate(servico);
+			adicionarLink.adicionarLinkDelete(servico);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Servico>(servico, status);
 	}
+	
 	@DeleteMapping("/excluir/{idServico}")
 	public ResponseEntity<?> excluirServicoID(@PathVariable Long idServico){
 		List<Empresa> empresas = repositorioEmpresa.findAll();

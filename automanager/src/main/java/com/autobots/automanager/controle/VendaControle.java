@@ -22,6 +22,7 @@ import com.autobots.automanager.entitades.Servico;
 import com.autobots.automanager.entitades.Usuario;
 import com.autobots.automanager.entitades.Veiculo;
 import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.modeleos.AdicionadorLinkVenda;
 import com.autobots.automanager.modeleos.VendaMolde;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.RepositorioMercadoria;
@@ -46,33 +47,47 @@ public class VendaControle {
 	public RepositorioMercadoria repositorioMercadoria;
 	@Autowired
 	public RepositorioServico repositorioServico;
-	
+	@Autowired
+	public AdicionadorLinkVenda adicionarLink;
 	
 	@GetMapping("/buscarVendas")
-	public ResponseEntity<List<Venda>> buscaVendas(){
+	public ResponseEntity<List<Venda>> buscarVendas() {
 		List<Venda> vendas = repositorio.findAll();
-		return new ResponseEntity<List<Venda>>(vendas,HttpStatus.FOUND);
+		adicionarLink.adicionarLink(vendas);
+		if(!vendas.isEmpty()) {
+			for(Venda venda: vendas) {
+				adicionarLink.adicionarLinkUpdate(venda);
+				adicionarLink.adicionarLinkDelete(venda);
+			}
+		}
+		return new ResponseEntity<List<Venda>>(vendas, HttpStatus.FOUND);
 	}
 	
+
 	@GetMapping("/buscar/{id}")
-	public ResponseEntity<Venda> buscarVendaID(@PathVariable Long id){
+	public ResponseEntity<Venda> buscarVendaID(@PathVariable Long id) {
 		Venda venda = repositorio.findById(id).orElse(null);
 		HttpStatus status = null;
-		if(venda == null) {
+		if (venda == null) {
 			status = HttpStatus.NOT_FOUND;
-		}else {
+		} 
+		else {
+			adicionarLink.adicionarLink(venda);
+			adicionarLink.adicionarLinkUpdate(venda);
+			adicionarLink.adicionarLinkDelete(venda);
 			status = HttpStatus.FOUND;
 		}
 		return new ResponseEntity<Venda>(venda, status);
 	}
 	
 	@PostMapping("/cadastrar")
-	public ResponseEntity<Empresa> cadastrarVenda(@RequestBody VendaMolde dados){
+	public ResponseEntity<Empresa> cadastroVenda(@RequestBody VendaMolde dados){
 		Empresa empresa = repositorioEmpresa.findById(dados.getIdEmpresa()).orElse(null);
 		Venda venda = new Venda();
 		if(empresa == null) {
 			return new ResponseEntity<Empresa>(empresa,HttpStatus.NOT_FOUND);
-		}else {
+		}
+		else {
 			venda.setCliente(repositorioUsuario.findById(dados.getIdCliente()).orElse(null));
 			venda.setFuncionario(repositorioUsuario.findById(dados.getIdFuncionario()).orElse(null));
 			venda.setVeiculo(repositorioVeiculo.findById(dados.getIdVeiculo()).orElse(null));
@@ -84,7 +99,7 @@ public class VendaControle {
 			Set<Long> idsServicos = dados.getIdServicos();
 			
 			if(dados.getIdMercadorias() != null) {
-				if(dados.getIdMercadorias().size() > 0) {	
+				if(!dados.getIdMercadorias().isEmpty()) {	
 					for (Long id : idsMercadorias) {
 						Mercadoria respostaBuscar = repositorioMercadoria.getById(id);
 						Mercadoria mercadoria = new Mercadoria();
@@ -100,9 +115,8 @@ public class VendaControle {
 					}
 				}
 			}
-
-			if(dados.getIdMercadorias() != null) {	
-				if(dados.getIdServicos().size() > 0) {				
+			if(dados.getIdServicos() != null) {	
+				if(!dados.getIdServicos().isEmpty()) {				
 					for (Long id : idsServicos) {
 						Servico respostaBusca = repositorioServico.getById(id);
 						Servico servico = new Servico();
@@ -114,15 +128,16 @@ public class VendaControle {
 					}
 				}
 			}
-			
 			repositorio.save(venda);
-			
 			empresa.getVendas().add(venda);
 			Usuario funcionario = venda.getFuncionario();
-			
 			funcionario.getVendas().add(venda);
 			repositorioEmpresa.save(empresa);
-			
+			for(Venda vendaRegistrada: empresa.getVendas()) {
+				adicionarLink.adicionarLink(vendaRegistrada);
+				adicionarLink.adicionarLinkUpdate(vendaRegistrada);
+				adicionarLink.adicionarLinkDelete(vendaRegistrada);
+			}
 			return new ResponseEntity<Empresa>(empresa,HttpStatus.CREATED);
 		}
 	}
